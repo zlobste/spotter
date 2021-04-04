@@ -19,7 +19,7 @@ type config struct {
 }
 
 // NewConfig returns global service configurations.
-func NewConfig(path string) Config {
+func New(path string) Config {
 	cfg := config{}
 
 	yamlConfig, err := ioutil.ReadFile(path)
