@@ -1,5 +1,5 @@
-addr: :7000
+addr: :4000
 log: debug
 db:
-  url: postgres://postgres:test@localhost:6060/users?sslmode=disable
+  url: postgres://postgres:postgres@spotter-db/spotter?sslmode=disable
   migrate: up
