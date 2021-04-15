@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/zlobste/spotter/app/utils/validation"
+	"github.com/zlobste/spotter/app/utils/render"
 	"net/http"
 	"time"
 )
@@ -13,7 +13,7 @@ func LoggingMiddleware(logger *logrus.Logger) func(http.Handler) http.Handler {
 			defer func() {
 				if rvr := recover(); rvr != nil {
 					logger.Error("Something bad happened\n", rvr)
-					validation.Respond(w, http.StatusInternalServerError, validation.Message("Something Bad Happened"))
+					render.Respond(w, http.StatusInternalServerError, render.Message("Something Bad Happened"))
 				}
 			}()
 
