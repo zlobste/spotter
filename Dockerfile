@@ -4,10 +4,7 @@ RUN mkdir ./app
 COPY . ./app
 WORKDIR ./app
 
-RUN CGO_ENABLED=0 \
-    GOOS=linux \
-    go build -o /go/bin/spotter \
-       /app/cmd/spotter
+RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/spotter ./
 
 FROM alpine:3.9
 
