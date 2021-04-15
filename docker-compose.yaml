@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  spotter-db:
+    image: postgres
+    container_name: spotter-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=spotter
+    volumes: ["db-data:/var/lib/postgresql/data"]
+
+  spotter-init:
+    image: $SPOTTER_IMAGE
+    container_name: spotter-init
+    depends_on:
+      - spotter-db
+    restart: on-failure:5
+    environment:
+      - CONFIG=/config.yaml
+    volumes: ["./config.yaml:/config.yaml"]
+    entrypoint: ["spotter", "migrate", "up"]
+
+  spotter:
+    image: $SPOTTER_IMAGE
+    container_name: spotter
+    depends_on:
+      - spotter-init
+    restart: on-failure:5
+    ports:
+      - 4000:4000
+    environment:
+      - CONFIG=/config.yaml
+    entrypoint: ["spotter"]
+    volumes: ["./config.yaml:/config.yaml"]
+
+volumes:
+  db-data:

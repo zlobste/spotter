@@ -1,21 +1,14 @@
-FROM golang:1.16
+FROM golang:1.16 AS build
 
-# Define workdir
 RUN mkdir ./app
 COPY . ./app
 WORKDIR ./app
 
-# Download dependencies
-RUN go get -d -v
+RUN CGO_ENABLED=0 \
+    GOOS=linux \
+    go build -o /go/bin/spotter \
+       /app/cmd/spotter
 
-# Install the package
-RUN go install -v
+FROM alpine:3.9
 
-# Set config file
-ENV CONFIG=config.yaml
-
-# This container exposes port 80 to the outside world
-EXPOSE 80
-
-# Run the executable
-CMD ["spotter"]
+COPY --from=build /go/bin/spotter /usr/local/bin/spotter
