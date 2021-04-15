@@ -2,48 +2,55 @@ package config
 
 import (
 	"fmt"
+	_ "github.com/lib/pq" // here
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 )
 
-// Config defines an interface of global service configurations.
 type Config interface {
-	Logger() *logrus.Logger
+	Listener() string
+	Logger
+	Databaser
 }
 
-// Config defines global service configurations.
 type config struct {
-	Log string `yaml:"log"`
+	Addr     string   `yaml:"addr"`
+	Log      string   `yaml:"log"`
+	Database Database `yaml:"db"`
+
+	Logger
+	Databaser
 }
 
-// NewConfig returns global service configurations.
+type Database struct {
+	URL    string `yaml:"url"`
+	Method string `yaml:"migrate"`
+}
+
 func New(path string) Config {
 	cfg := config{}
 
 	yamlConfig, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic(errors.Wrap(err, fmt.Sprintf("failed to read config: %s", path)))
+		panic(errors.New(fmt.Sprintf("failed to read config: %s", path)))
 	}
 
 	err = yaml.Unmarshal(yamlConfig, &cfg)
 	if err != nil {
-		panic(errors.Wrap(err, fmt.Sprintf("failed to unmarshal config: %s", path)))
+		panic(errors.New(fmt.Sprintf("failed to unmarshal config: %s", path)))
 	}
+
+	if port := os.Getenv("PORT"); port != "" {
+		cfg.Addr = ":" + port
+	}
+	cfg.Logger = NewLogger(cfg.Log)
+	cfg.Databaser = NewDatabaser(cfg.Database.URL, cfg.Database.Method, cfg.Logger.Logging())
 
 	return &cfg
 }
 
-// Logger returns new configured logger.
-func (c *config) Logger() *logrus.Logger {
-	level, err := logrus.ParseLevel(c.Log)
-	if err != nil {
-		panic(errors.Wrapf(err, "failed to parse logging level %s", c.Log))
-	}
-
-	logger := logrus.New()
-	logger.SetLevel(level)
-
-	return logger
+func (c *config) Listener() string {
+	return c.Addr
 }

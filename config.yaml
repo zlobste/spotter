@@ -1,0 +1,5 @@
+addr: :80
+log: debug
+db:
+  url: <secret_postgres_db:path>
+  migrate: up
