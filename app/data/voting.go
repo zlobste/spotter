@@ -9,3 +9,5 @@ type Voting struct {
 	Description string    `db:"description"`
 	EndTime     time.Time `db:"end_time"`
 }
+
+type VotingsStorage interface {}

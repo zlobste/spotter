@@ -6,3 +6,5 @@ type Group struct {
 	Description string `db:"description"`
 	Level       uint64 `db:"level"`
 }
+
+type GroupsStorage interface {}

@@ -8,3 +8,5 @@ type Confirmation struct {
 	Date      time.Time `db:"date"`
 	Confirmed bool      `db:"confirmed"`
 }
+
+type ConfirmationsStorage interface {}

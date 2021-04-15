@@ -8,3 +8,5 @@ type Timer struct {
 	StartTime time.Time     `db:"start_time"`
 	Duration  time.Duration `db:"duration"`
 }
+
+type TimersStorage interface {}

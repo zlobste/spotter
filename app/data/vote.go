@@ -5,3 +5,5 @@ type Vote struct {
 	VotingId uint64 `db:"voting_id"`
 	Decided  bool   `db:"decided"`
 }
+
+type VotesStorage interface {}
