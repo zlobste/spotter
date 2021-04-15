@@ -53,7 +53,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check that user is created successfully
 	user, err = context.Users(r).GetUser(request.Data.Email)
 	if err != nil {
 		log.WithError(err).Error("failed to find user")

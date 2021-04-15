@@ -1,11 +1,13 @@
 package app
 
 import (
-	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/zlobste/spotter/app/config"
+	"github.com/zlobste/spotter/app/context"
+	"github.com/zlobste/spotter/app/data/postgres"
+	"github.com/zlobste/spotter/app/utils/middlewares"
 	"github.com/zlobste/spotter/app/web/handlers"
 	"net/http"
 )
@@ -28,7 +30,6 @@ func New(cfg config.Config) App {
 
 func (a *app) Run() error {
 	defer func() {
-		// recover if something has broken
 		if rvr := recover(); rvr != nil {
 			a.log.Error("app panicked\n", rvr)
 		}
@@ -45,28 +46,16 @@ func (a *app) router() chi.Router {
 	router := chi.NewRouter()
 
 	router.Use(
-		cors.Middleware(),
-		logging.Middleware(a.log),
-		ctx.Middleware(
-			ctx.CtxLog(a.log),
-			ctx.CtxConfig(a.config),
-			ctx.CtxUsers(postgres.NewUsers(a.config)),
+		middlewares.CorsMiddleware(),
+		middlewares.LoggingMiddleware(a.log),
+		middlewares.CtxMiddleware(
+			context.CtxLog(a.log),
+			context.CtxConfig(a.config),
+			context.CtxUsers(postgres.NewUsersStorage(a.config)),
 		),
 	)
 
-	router.Route("/logo/users", func(r chi.Router) {
-		r.Route(fmt.Sprintf("/{%s}", web.UsernameRequestKey), func(r chi.Router) {
-			r.Post("/auth", handlers.GetUser)
-			r.Options("/auth", handlers.OptionsMock)
-			r.Patch("/", handlers.UpdateUser)
-			r.Delete("/", handlers.DeleteUser)
-			r.Options("/", handlers.OptionsMock)
-		})
-		r.Route(fmt.Sprintf("/uid/{%s}", web.UserIDRequestKey), func(r chi.Router) {
-			r.Get("/", handlers.GetUserByID)
-			r.Options("/", handlers.OptionsMock)
-		})
-		r.Options("/", handlers.OptionsMock)
+	router.Route("/users", func(r chi.Router) {
 		r.Post("/", handlers.CreateUser)
 	})
 
