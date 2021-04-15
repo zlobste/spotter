@@ -19,6 +19,7 @@ type userStorage struct {
 }
 
 type UsersStorage interface {
+	New() UsersStorage
 	Get() (*data.User, error)
 	GetUser(username string) (*data.User, error)
 	GetUserById(id int64) (*data.User, error)

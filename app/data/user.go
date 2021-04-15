@@ -28,3 +28,16 @@ func (u User) ToMap() map[string]interface{} {
 
 	return result
 }
+
+func (u User) ToReturn() map[string]interface{} {
+	result := map[string]interface{}{
+		"user_id":   u.Id,
+		"name":     u.Name,
+		"surname":  u.Surname,
+		"email":    u.Email,
+		"balance":  u.Balance,
+		"role":     u.Role,
+	}
+
+	return result
+}
