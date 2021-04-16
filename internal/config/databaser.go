@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/zlobste/spotter/app/data/migration"
+	"github.com/zlobste/spotter/internal/data/migration"
 	"sync"
 )
 

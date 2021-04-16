@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
-	"github.com/zlobste/spotter/app/assets"
+	"github.com/zlobste/spotter/internal/assets"
 )
 
 const (

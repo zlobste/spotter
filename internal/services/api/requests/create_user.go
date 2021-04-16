@@ -5,7 +5,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/app/data"
+	"github.com/zlobste/spotter/internal/data"
 	"net/http"
 )
 

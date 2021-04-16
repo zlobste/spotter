@@ -3,8 +3,8 @@ package context
 import (
 	"context"
 	"github.com/sirupsen/logrus"
-	"github.com/zlobste/spotter/app/config"
-	"github.com/zlobste/spotter/app/data/postgres"
+	"github.com/zlobste/spotter/internal/config"
+	"github.com/zlobste/spotter/internal/data/postgres"
 	"net/http"
 )
 

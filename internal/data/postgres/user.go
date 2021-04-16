@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/app/config"
-	"github.com/zlobste/spotter/app/data"
+	"github.com/zlobste/spotter/internal/config"
+	"github.com/zlobste/spotter/internal/data"
 )
 
 const (

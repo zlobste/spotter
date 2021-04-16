@@ -1,9 +1,9 @@
 package config
 
 import (
-"github.com/pkg/errors"
-"github.com/sirupsen/logrus"
-"sync"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"sync"
 )
 
 type Logger interface {

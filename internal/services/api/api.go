@@ -1,14 +1,14 @@
-package app
+package api
 
 import (
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/zlobste/spotter/app/config"
-	"github.com/zlobste/spotter/app/context"
-	"github.com/zlobste/spotter/app/data/postgres"
-	"github.com/zlobste/spotter/app/utils/middlewares"
-	"github.com/zlobste/spotter/app/web/handlers"
+	"github.com/zlobste/spotter/internal/config"
+	"github.com/zlobste/spotter/internal/context"
+	"github.com/zlobste/spotter/internal/data/postgres"
+	"github.com/zlobste/spotter/internal/services/api/handlers"
+	"github.com/zlobste/spotter/internal/services/api/middlewares"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ func New(cfg config.Config) App {
 func (a *app) Run() error {
 	defer func() {
 		if rvr := recover(); rvr != nil {
-			a.log.Error("app panicked\n", rvr)
+			a.log.Error("internal panicked\n", rvr)
 		}
 	}()
 

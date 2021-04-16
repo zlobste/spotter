@@ -5,4 +5,4 @@
 // and any other packr generated files.
 package assets
 
-import _ "github.com/zlobste/spotter/app/assets/packrd"
+import _ "github.com/zlobste/spotter/internal/assets/packrd"
