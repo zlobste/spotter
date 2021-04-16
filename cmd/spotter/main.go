@@ -1,4 +1,4 @@
-package spotter
+package main
 
 import (
 	"github.com/pkg/errors"
