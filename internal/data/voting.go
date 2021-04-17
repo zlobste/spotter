@@ -10,4 +10,25 @@ type Voting struct {
 	EndTime     time.Time `db:"end_time"`
 }
 
-type VotingsStorage interface {}
+func (v Voting) ToMap() map[string]interface{} {
+	result := map[string]interface{}{
+		"creator_id":  v.CreatorId,
+		"title":       v.Title,
+		"description": v.Description,
+		"end_time":    v.EndTime,
+	}
+
+	return result
+}
+
+func (v Voting) ToReturn() map[string]interface{} {
+	result := map[string]interface{}{
+		"id":          v.Id,
+		"creator_id":  v.CreatorId,
+		"title":       v.Title,
+		"description": v.Description,
+		"end_time":    v.EndTime,
+	}
+
+	return result
+}

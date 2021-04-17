@@ -9,4 +9,13 @@ type Confirmation struct {
 	Confirmed bool      `db:"confirmed"`
 }
 
-type ConfirmationsStorage interface {}
+func (c Confirmation) ToMap() map[string]interface{} {
+	result := map[string]interface{}{
+		"user_id":   c.UserId,
+		"timer_id":  c.TimerId,
+		"date":      c.Date,
+		"confirmed": c.Confirmed,
+	}
+
+	return result
+}

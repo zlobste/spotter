@@ -6,4 +6,12 @@ type Vote struct {
 	Decided  bool   `db:"decided"`
 }
 
-type VotesStorage interface {}
+func (v Vote) ToMap() map[string]interface{} {
+	result := map[string]interface{}{
+		"user_id":   v.UserId,
+		"voting_id": v.VotingId,
+		"decided":   v.Decided,
+	}
+
+	return result
+}

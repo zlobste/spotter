@@ -5,4 +5,11 @@ type UserGroup struct {
 	UserId  uint64 `db:"user_id"`
 }
 
-type UserGroupsStorage interface {}
+func (u UserGroup) ToMap() map[string]interface{} {
+	result := map[string]interface{}{
+		"group_id": u.UserId,
+		"user_id":  u.GroupId,
+	}
+
+	return result
+}

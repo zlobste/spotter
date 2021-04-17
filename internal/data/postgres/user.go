@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	all        = "*"
 	usersTable = "users"
+	all        = "*"
 )
 
 type userStorage struct {
@@ -64,8 +64,8 @@ func (s *userStorage) Get() (*data.User, error) {
 	return &user, nil
 }
 
-func (s *userStorage) GetUser(username string) (*data.User, error) {
-	s.sql = s.sql.Where(sq.Eq{"username": username})
+func (s *userStorage) GetUser(email string) (*data.User, error) {
+	s.sql = s.sql.Where(sq.Eq{"email": email})
 	return s.Get()
 }
 
@@ -90,8 +90,8 @@ func (s *userStorage) newUpdate() sq.UpdateBuilder {
 	return sq.Update(usersTable).RunWith(s.db).PlaceholderFormat(sq.Dollar)
 }
 
-func (s *userStorage) UpdateUser(oldUsername string, user data.User) error {
-	_, err := s.newUpdate().SetMap(user.ToMap()).Where(sq.Eq{"username": oldUsername}).Exec()
+func (s *userStorage) UpdateUser(email string, user data.User) error {
+	_, err := s.newUpdate().SetMap(user.ToMap()).Where(sq.Eq{"email": email}).Exec()
 	if err != nil {
 		return errors.Wrap(err, "failed to update user data")
 	}
@@ -102,8 +102,8 @@ func (s *userStorage) newDelete() sq.DeleteBuilder {
 	return sq.Delete(usersTable).RunWith(s.db).PlaceholderFormat(sq.Dollar)
 }
 
-func (s *userStorage) DeleteUser(username string) error {
-	_, err := s.newDelete().Where(sq.Eq{"username": username}).Exec()
+func (s *userStorage) DeleteUser(email string) error {
+	_, err := s.newDelete().Where(sq.Eq{"email": email}).Exec()
 	if err != nil {
 		return errors.Wrap(err, "failed to delete user")
 	}

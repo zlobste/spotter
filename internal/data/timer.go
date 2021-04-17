@@ -9,4 +9,23 @@ type Timer struct {
 	Duration  time.Duration `db:"duration"`
 }
 
-type TimersStorage interface {}
+func (t Timer) ToMap() map[string]interface{} {
+	result := map[string]interface{}{
+		"group_id":   t.GroupId,
+		"start_time": t.StartTime,
+		"duration":   t.Duration,
+	}
+
+	return result
+}
+
+func (t Timer) ToReturn() map[string]interface{} {
+	result := map[string]interface{}{
+		"id":         t.Id,
+		"group_id":   t.GroupId,
+		"start_time": t.StartTime,
+		"duration":   t.Duration,
+	}
+
+	return result
+}

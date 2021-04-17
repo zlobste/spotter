@@ -33,7 +33,7 @@ func (u User) ToMap() map[string]interface{} {
 
 func (u User) ToReturn() map[string]interface{} {
 	result := map[string]interface{}{
-		"user_id": u.Id,
+		"id": u.Id,
 		"name":    u.Name,
 		"surname": u.Surname,
 		"email":   u.Email,

@@ -7,4 +7,23 @@ type Group struct {
 	Level       uint64 `db:"level"`
 }
 
-type GroupsStorage interface {}
+func (g Group) ToMap() map[string]interface{} {
+	result := map[string]interface{}{
+		"title":       g.Title,
+		"description": g.Description,
+		"level":       g.Level,
+	}
+
+	return result
+}
+
+func (g Group) ToReturn() map[string]interface{} {
+	result := map[string]interface{}{
+		"id":    g.Id,
+		"title":       g.Title,
+		"description": g.Description,
+		"level":       g.Level,
+	}
+
+	return result
+}
