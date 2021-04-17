@@ -47,6 +47,8 @@ func (s *votingStorage) Get() (*data.Voting, error) {
 	model := data.Voting{}
 	err := rowScanner.Scan(
 		&model.Id,
+		&model.Victim,
+		&model.Type,
 		&model.Title,
 		&model.Description,
 		&model.EndTime,
