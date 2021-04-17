@@ -33,7 +33,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if we have such user already
-	user, err := context.Users(r).GetUser(request.Data.Email)
+	user, err := context.Users(r).GetUserById(request.Data.Id)
 	if err != nil {
 		log.WithError(err).Error("failed to get user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened"))
@@ -52,7 +52,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err = context.Users(r).GetUser(request.Data.Email)
+	user, err = context.Users(r).GetUserById(request.Data.Id)
 	if err != nil {
 		log.WithError(err).Error("failed to find user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the user"))
