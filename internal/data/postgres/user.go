@@ -21,11 +21,10 @@ type userStorage struct {
 type UsersStorage interface {
 	New() UsersStorage
 	Get() (*data.User, error)
-	GetUser(username string) (*data.User, error)
-	GetUserById(id int64) (*data.User, error)
+	GetUserById(id uint64) (*data.User, error)
 	CreateUser(user data.User) error
-	UpdateUser(oldUsername string, user data.User) error
-	DeleteUser(username string) error
+	UpdateUser(id uint64, user data.User) error
+	DeleteUser(id uint64) error
 }
 
 var usersSelect = sq.Select(all).From(usersTable).PlaceholderFormat(sq.Dollar)
@@ -46,30 +45,25 @@ func (s *userStorage) New() UsersStorage {
 
 func (s *userStorage) Get() (*data.User, error) {
 	rowScanner := s.sql.QueryRow()
-	user := data.User{}
+	model := data.User{}
 	err := rowScanner.Scan(
-		&user.Id,
-		&user.Name,
-		&user.Surname,
-		&user.Email,
-		&user.Password,
-		&user.Balance,
-		&user.Role,
+		&model.Id,
+		&model.Name,
+		&model.Surname,
+		&model.Email,
+		&model.Password,
+		&model.Balance,
+		&model.Role,
 	)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, errors.Wrap(err, "failed to query user")
+		return nil, errors.Wrap(err, "failed to query model")
 	} else if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return &user, nil
+	return &model, nil
 }
 
-func (s *userStorage) GetUser(email string) (*data.User, error) {
-	s.sql = s.sql.Where(sq.Eq{"email": email})
-	return s.Get()
-}
-
-func (s *userStorage) GetUserById(id int64) (*data.User, error) {
+func (s *userStorage) GetUserById(id uint64) (*data.User, error) {
 	s.sql = s.sql.Where(sq.Eq{"id": id})
 	return s.Get()
 }
@@ -90,8 +84,8 @@ func (s *userStorage) newUpdate() sq.UpdateBuilder {
 	return sq.Update(usersTable).RunWith(s.db).PlaceholderFormat(sq.Dollar)
 }
 
-func (s *userStorage) UpdateUser(email string, user data.User) error {
-	_, err := s.newUpdate().SetMap(user.ToMap()).Where(sq.Eq{"email": email}).Exec()
+func (s *userStorage) UpdateUser(id uint64, user data.User) error {
+	_, err := s.newUpdate().SetMap(user.ToMap()).Where(sq.Eq{"id": id}).Exec()
 	if err != nil {
 		return errors.Wrap(err, "failed to update user data")
 	}
@@ -102,8 +96,8 @@ func (s *userStorage) newDelete() sq.DeleteBuilder {
 	return sq.Delete(usersTable).RunWith(s.db).PlaceholderFormat(sq.Dollar)
 }
 
-func (s *userStorage) DeleteUser(email string) error {
-	_, err := s.newDelete().Where(sq.Eq{"email": email}).Exec()
+func (s *userStorage) DeleteUser(id uint64) error {
+	_, err := s.newDelete().Where(sq.Eq{"id": id}).Exec()
 	if err != nil {
 		return errors.Wrap(err, "failed to delete user")
 	}
