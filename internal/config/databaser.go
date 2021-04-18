@@ -13,7 +13,6 @@ type Databaser interface {
 
 type databaser struct {
 	url    string
-	method string
 
 	cache struct {
 		db *sql.DB
@@ -23,10 +22,9 @@ type databaser struct {
 	sync.Once
 }
 
-func NewDatabaser(url, method string, log *logrus.Logger) Databaser {
+func NewDatabaser(url string, log *logrus.Logger) Databaser {
 	return &databaser{
 		url:    url,
-		method: method,
 		log:    log,
 	}
 }

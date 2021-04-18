@@ -57,6 +57,7 @@ func (a *app) router() chi.Router {
 
 	router.Route("/users", func(r chi.Router) {
 		r.Post("/", handlers.CreateUser)
+		r.Get("/{id}", handlers.GetUser)
 	})
 
 	return router

@@ -8,50 +8,20 @@ import (
 	"github.com/zlobste/spotter/internal/assets"
 	"github.com/zlobste/spotter/internal/config"
 	"github.com/zlobste/spotter/internal/services/api"
+	"github.com/zlobste/spotter/internal/services/timer"
 	"os"
 )
 
 func main() {
 	defer func() {
 		if rvr := recover(); rvr != nil {
-			logrus.New().Error("internal panicked\n", rvr)
+			logrus.New().Error("internal panicked", rvr)
 		}
 	}()
 
 	app := initApp()
 	if err := app.Run(os.Args); err != nil {
 		logrus.New().WithError(err).Fatal("internal failed")
-	}
-}
-
-func run(*cli.Context) error {
-	cfg := config.New(os.Getenv("CONFIG"))
-
-	srv := api.New(cfg)
-	if err := srv.Run(); err != nil {
-		return errors.Wrap(err, "failed to start api")
-	}
-
-	return nil
-}
-
-func migrateCmd(dir migrate.MigrationDirection) func(ctx *cli.Context) error {
-	return func(c *cli.Context) error {
-		cfg := config.New(os.Getenv("CONFIG"))
-
-		source := migrate.PackrMigrationSource{
-			Box: assets.Migrations,
-		}
-
-		count, err := migrate.Exec(cfg.DB(), "postgres", source, dir)
-		if err != nil {
-			return errors.Wrap(err, "failed to run migrations")
-		}
-
-		cfg.Logging().WithField("count", count).
-			Info("applied migrations")
-
-		return nil
 	}
 }
 
@@ -77,5 +47,41 @@ func initApp() *cli.App {
 				},
 			},
 		},
+	}
+}
+
+func run(*cli.Context) error {
+	cfg := config.New(os.Getenv("CONFIG"))
+
+	go func() {
+		if err := timer.New(cfg).Run(); err != nil {
+			panic(errors.Wrap(err, "failed to start timer"))
+		}
+	}()
+
+	if err := api.New(cfg).Run(); err != nil {
+		return errors.Wrap(err, "failed to start api")
+	}
+
+	return nil
+}
+
+func migrateCmd(dir migrate.MigrationDirection) func(ctx *cli.Context) error {
+	return func(c *cli.Context) error {
+		cfg := config.New(os.Getenv("CONFIG"))
+
+		source := migrate.PackrMigrationSource{
+			Box: assets.Migrations,
+		}
+
+		count, err := migrate.Exec(cfg.DB(), "postgres", source, dir)
+		if err != nil {
+			return errors.Wrap(err, "failed to run migrations")
+		}
+
+		cfg.Logging().WithField("count", count).
+			Info("applied migrations")
+
+		return nil
 	}
 }

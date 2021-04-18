@@ -16,17 +16,16 @@ type Config interface {
 }
 
 type config struct {
-	Addr     string   `yaml:"addr"`
-	Log      string   `yaml:"log"`
-	Database Database `yaml:"db"`
+	Addr        string `yaml:"addr"`
+	Log         string `yaml:"log"`
+	DatabaseUrl string `yaml:"db_url"`
 
 	Logger
 	Databaser
 }
 
 type Database struct {
-	URL    string `yaml:"url"`
-	Method string `yaml:"migrate"`
+	URL string `yaml:"url"`
 }
 
 func New(path string) Config {
@@ -46,7 +45,7 @@ func New(path string) Config {
 		cfg.Addr = ":" + port
 	}
 	cfg.Logger = NewLogger(cfg.Log)
-	cfg.Databaser = NewDatabaser(cfg.Database.URL, cfg.Database.Method, cfg.Logger.Logging())
+	cfg.Databaser = NewDatabaser(cfg.DatabaseUrl, cfg.Logger.Logging())
 
 	return &cfg
 }

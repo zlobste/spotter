@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/go-chi/chi"
 	ozzoval "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/zlobste/spotter/internal/context"
 	"github.com/zlobste/spotter/internal/services/api/requests"
 	"github.com/zlobste/spotter/internal/utils"
 	"net/http"
+	"strconv"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +55,31 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err = context.Users(r).GetUserById(request.Data.Id)
+	if err != nil {
+		log.WithError(err).Error("failed to find user")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the user"))
+		return
+	}
+
+	utils.Respond(w, http.StatusOK, utils.Message(user.ToReturn()))
+}
+
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "id")
+	if userId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("User id is empty"))
+		return
+	}
+
+	id, err := strconv.Atoi(userId)
+	if userId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("Invalid id"))
+		return
+	}
+
+	user, err := context.Users(r).GetUserById(uint64(id))
+	log := context.Log(r)
 	if err != nil {
 		log.WithError(err).Error("failed to find user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the user"))
