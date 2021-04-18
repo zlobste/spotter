@@ -9,29 +9,36 @@ import (
 	"github.com/zlobste/spotter/internal/data/postgres"
 	"github.com/zlobste/spotter/internal/services/api/handlers"
 	"github.com/zlobste/spotter/internal/services/api/middlewares"
+	"github.com/zlobste/spotter/internal/services/timer"
 	"net/http"
 )
 
-type App interface {
+type API interface {
 	Run() error
 }
 
-type app struct {
+type api struct {
 	log    *logrus.Logger
 	config config.Config
 }
 
-func New(cfg config.Config) App {
-	return &app{
+func New(cfg config.Config) API {
+	return &api{
 		config: cfg,
 		log:    cfg.Logging(),
 	}
 }
 
-func (a *app) Run() error {
+func (a *api) Run() error {
 	defer func() {
 		if rvr := recover(); rvr != nil {
 			a.log.Error("internal panicked\n", rvr)
+		}
+	}()
+
+	go func() {
+		if err := timer.New(a.config).Run(); err != nil {
+			panic(errors.Wrap(err, "failed to start timer"))
 		}
 	}()
 
@@ -42,7 +49,7 @@ func (a *app) Run() error {
 	return nil
 }
 
-func (a *app) router() chi.Router {
+func (a *api) router() chi.Router {
 	router := chi.NewRouter()
 
 	router.Use(
