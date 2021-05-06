@@ -3,12 +3,12 @@ package data
 import "time"
 
 type Voting struct {
-	Id          uint64    `db:"id"`
-	Victim      uint64    `db:"victim"`
-	Type        uint64    `db:"type"`
-	Title       string    `db:"title"`
-	Description string    `db:"description"`
-	EndTime     time.Time `db:"end_time"`
+	Id          uint64    `db:"id" json:"id"`
+	Victim      uint64    `db:"victim" json:"victim"`
+	Type        uint64    `db:"type" json:"type"`
+	Title       string    `db:"title" json:"title"`
+	Description string    `db:"description" json:"description"`
+	EndTime     time.Time `db:"end_time" json:"end_time"`
 }
 
 func (v Voting) ToMap() map[string]interface{} {

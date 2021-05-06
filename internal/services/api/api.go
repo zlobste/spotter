@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -20,12 +21,14 @@ type API interface {
 type api struct {
 	log    *logrus.Logger
 	config config.Config
+	db     *sql.DB
 }
 
 func New(cfg config.Config) API {
 	return &api{
 		config: cfg,
 		log:    cfg.Logging(),
+		db:     cfg.DB(),
 	}
 }
 
@@ -58,13 +61,13 @@ func (a *api) router() chi.Router {
 		middlewares.CtxMiddleware(
 			context.CtxLog(a.log),
 			context.CtxConfig(a.config),
-			context.CtxUsers(postgres.NewUsersStorage(a.config)),
+			context.CtxUsers(postgres.NewUsersStorage(a.db)),
 		),
 	)
 
 	router.Route("/users", func(r chi.Router) {
-		r.Post("/", handlers.CreateUser)
-		r.Get("/{id}", handlers.GetUser)
+		r.Post("/create", handlers.CreateUserHandler)
+		r.Get("/{id}", handlers.GetUserHandler)
 	})
 
 	return router

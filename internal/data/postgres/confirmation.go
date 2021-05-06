@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/internal/config"
 	"github.com/zlobste/spotter/internal/data"
 )
 
@@ -28,17 +27,14 @@ type confirmationsStorage interface {
 
 var confirmationsSelect = sq.Select(all).From(confirmationsTable).PlaceholderFormat(sq.Dollar)
 
-func NewConfirmationsStorage(cfg config.Config) confirmationsStorage {
-	return &confirmationStorage{
-		db:  cfg.DB(),
-		sql: confirmationsSelect.RunWith(cfg.DB()),
-	}
+func (s *confirmationStorage) New() confirmationsStorage {
+	return NewConfirmationsStorage(s.db)
 }
 
-func (s *confirmationStorage) New() confirmationsStorage {
+func NewConfirmationsStorage(db *sql.DB) confirmationsStorage {
 	return &confirmationStorage{
-		db:  s.db,
-		sql: confirmationsSelect.RunWith(s.db),
+		db:  db,
+		sql: confirmationsSelect.RunWith(db),
 	}
 }
 

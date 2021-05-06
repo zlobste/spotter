@@ -7,8 +7,8 @@ create table users
     email    text  not null unique,
     password text  not null,
     role     int   not null default 2,
-    balance  money not null default 0,
-    salary   money not null default 0,
+    balance  float not null default 0,
+    salary   float not null default 0,
     primary key (id)
 );
 

@@ -19,7 +19,7 @@ func Run(args []string) bool {
 
 	app := kingpin.New("spotter", "")
 	runCmd := app.Command("run", "run command")
-	serviceCmd := runCmd.Command("service", "run service") // you can insert custom help
+	apiCmd := runCmd.Command("api", "run api")
 
 	migrateCmd := app.Command("migrate", "migrate command")
 	migrateUpCmd := migrateCmd.Command("up", "migrate db up")
@@ -32,7 +32,7 @@ func Run(args []string) bool {
 	}
 
 	switch cmd {
-	case serviceCmd.FullCommand():
+	case apiCmd.FullCommand():
 		if err := api.New(cfg).Run(); err != nil {
 			log.Error("failed to start api", err)
 			return false

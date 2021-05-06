@@ -16,15 +16,9 @@ func New(cfg config.Config) *Service {
 }
 
 func (s *Service) Run() error {
-
-
-
 	return nil
 }
 
 func (s *Service) CreateVoting() error {
-
-
-
 	return nil
 }

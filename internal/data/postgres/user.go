@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/internal/config"
 	"github.com/zlobste/spotter/internal/data"
 )
 
@@ -22,6 +21,7 @@ type UsersStorage interface {
 	New() UsersStorage
 	Get() (*data.User, error)
 	GetUserById(id uint64) (*data.User, error)
+	GetUserByEmail(email string) (*data.User, error)
 	CreateUser(user data.User) error
 	UpdateUser(id uint64, user data.User) error
 	DeleteUser(id uint64) error
@@ -29,17 +29,14 @@ type UsersStorage interface {
 
 var usersSelect = sq.Select(all).From(usersTable).PlaceholderFormat(sq.Dollar)
 
-func NewUsersStorage(cfg config.Config) UsersStorage {
-	return &userStorage{
-		db:  cfg.DB(),
-		sql: usersSelect.RunWith(cfg.DB()),
-	}
+func (s *userStorage) New() UsersStorage {
+	return NewUsersStorage(s.db)
 }
 
-func (s *userStorage) New() UsersStorage {
+func NewUsersStorage(db *sql.DB) UsersStorage {
 	return &userStorage{
-		db:  s.db,
-		sql: usersSelect.RunWith(s.db),
+		db:  db,
+		sql: usersSelect.RunWith(db),
 	}
 }
 
@@ -52,8 +49,9 @@ func (s *userStorage) Get() (*data.User, error) {
 		&model.Surname,
 		&model.Email,
 		&model.Password,
-		&model.Balance,
 		&model.Role,
+		&model.Balance,
+		&model.Salary,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, errors.Wrap(err, "failed to query model")
@@ -65,6 +63,11 @@ func (s *userStorage) Get() (*data.User, error) {
 
 func (s *userStorage) GetUserById(id uint64) (*data.User, error) {
 	s.sql = s.sql.Where(sq.Eq{"id": id})
+	return s.Get()
+}
+
+func (s *userStorage) GetUserByEmail(email string) (*data.User, error) {
+	s.sql = s.sql.Where(sq.Eq{"email": email})
 	return s.Get()
 }
 

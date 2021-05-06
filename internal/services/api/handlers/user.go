@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 
 	request, err := requests.NewCreateUserRequest(r)
@@ -26,7 +26,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// encrypt users password
 	request.Data.Password, err = utils.HashAndSalt(request.Data.Password)
 	if err != nil {
 		log.WithError(err).Error("failed to hash user password")
@@ -34,8 +33,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if we have such user already
-	user, err := context.Users(r).GetUserById(request.Data.Id)
+	user, err := context.Users(r).GetUserByEmail(request.Data.Email)
 	if err != nil {
 		log.WithError(err).Error("failed to get user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened"))
@@ -54,7 +52,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err = context.Users(r).GetUserById(request.Data.Id)
+	user, err = context.Users(r).GetUserByEmail(request.Data.Email)
 	if err != nil {
 		log.WithError(err).Error("failed to find user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the user"))
@@ -64,8 +62,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	utils.Respond(w, http.StatusOK, utils.Message(user.ToReturn()))
 }
 
-
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	userId := chi.URLParam(r, "id")
 	if userId == "" {
 		utils.Respond(w, http.StatusForbidden, utils.Message("User id is empty"))

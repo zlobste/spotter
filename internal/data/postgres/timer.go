@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/internal/config"
 	"github.com/zlobste/spotter/internal/data"
 )
 
@@ -28,17 +27,14 @@ type TimersStorage interface {
 
 var timersSelect = sq.Select(all).From(timersTable).PlaceholderFormat(sq.Dollar)
 
-func NewTimersStorage(cfg config.Config) TimersStorage {
-	return &timerStorage{
-		db:  cfg.DB(),
-		sql: timersSelect.RunWith(cfg.DB()),
-	}
+func (s *timerStorage) New() TimersStorage {
+	return NewTimersStorage(s.db)
 }
 
-func (s *timerStorage) New() TimersStorage {
+func NewTimersStorage(db *sql.DB) TimersStorage {
 	return &timerStorage{
-		db:  s.db,
-		sql: timersSelect.RunWith(s.db),
+		db:  db,
+		sql: timersSelect.RunWith(db),
 	}
 }
 

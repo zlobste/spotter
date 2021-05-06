@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/internal/config"
 	"github.com/zlobste/spotter/internal/data"
 )
 
@@ -28,17 +27,14 @@ type votesStorage interface {
 
 var votesSelect = sq.Select(all).From(votesTable).PlaceholderFormat(sq.Dollar)
 
-func NewVotesStorage(cfg config.Config) votesStorage {
-	return &voteStorage{
-		db:  cfg.DB(),
-		sql: votesSelect.RunWith(cfg.DB()),
-	}
+func (s *voteStorage) New() votesStorage {
+	return NewVotesStorage(s.db)
 }
 
-func (s *voteStorage) New() votesStorage {
+func NewVotesStorage(db *sql.DB) votesStorage {
 	return &voteStorage{
-		db:  s.db,
-		sql: votesSelect.RunWith(s.db),
+		db:  db,
+		sql: votesSelect.RunWith(db),
 	}
 }
 

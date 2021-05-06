@@ -1,9 +1,9 @@
 package data
 
 type Vote struct {
-	UserId   uint64 `db:"user_id"`
-	VotingId uint64 `db:"voting_id"`
-	Decided  bool   `db:"decided"`
+	UserId   uint64 `db:"user_id" json:"user_id"`
+	VotingId uint64 `db:"voting_id" json:"voting_id"`
+	Decided  bool   `db:"decided" json:"decided"`
 }
 
 func (v Vote) ToMap() map[string]interface{} {

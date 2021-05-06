@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/internal/config"
 	"github.com/zlobste/spotter/internal/data"
 )
 
@@ -28,17 +27,14 @@ type GroupsStorage interface {
 
 var groupsSelect = sq.Select(all).From(groupsTable).PlaceholderFormat(sq.Dollar)
 
-func NewGroupsStorage(cfg config.Config) GroupsStorage {
-	return &groupStorage{
-		db:  cfg.DB(),
-		sql: groupsSelect.RunWith(cfg.DB()),
-	}
+func (s *groupStorage) New() GroupsStorage {
+	return NewGroupsStorage(s.db)
 }
 
-func (s *groupStorage) New() GroupsStorage {
+func NewGroupsStorage(db *sql.DB) GroupsStorage {
 	return &groupStorage{
-		db:  s.db,
-		sql: groupsSelect.RunWith(s.db),
+		db:  db,
+		sql: groupsSelect.RunWith(db),
 	}
 }
 

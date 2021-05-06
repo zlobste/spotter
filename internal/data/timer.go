@@ -3,10 +3,10 @@ package data
 import "time"
 
 type Timer struct {
-	Id        uint64        `db:"id"`
-	GroupId   uint64        `db:"group_id"`
-	StartTime time.Time     `db:"start_time"`
-	Duration  time.Duration `db:"duration"`
+	Id        uint64        `db:"id" json:"id"`
+	GroupId   uint64        `db:"group_id" json:"group_id"`
+	StartTime time.Time     `db:"start_time" json:"start_time"`
+	Duration  time.Duration `db:"duration" json:"duration"`
 }
 
 func (t Timer) ToMap() map[string]interface{} {
