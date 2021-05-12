@@ -62,12 +62,17 @@ func (a *api) router() chi.Router {
 			context.CtxLog(a.log),
 			context.CtxConfig(a.config),
 			context.CtxUsers(postgres.NewUsersStorage(a.db)),
+			context.CtxGroups(postgres.NewGroupsStorage(a.db)),
 		),
 	)
 
 	router.Route("/users", func(r chi.Router) {
 		r.Post("/create", handlers.CreateUserHandler)
 		r.Get("/{id}", handlers.GetUserHandler)
+	})
+	router.Route("/group", func(r chi.Router) {
+		r.Post("/create", handlers.CreateGroupHandler)
+		r.Get("/{id}", handlers.GetGroupHandler)
 	})
 
 	return router

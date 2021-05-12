@@ -12,6 +12,7 @@ const (
 	ctxLog    = "ctxLog"
 	ctxConfig = "ctxConfig"
 	ctxUsers  = "ctxUsers"
+	ctxGroups = "ctxGroups"
 )
 
 func CtxConfig(cfg config.Config) func(context.Context) context.Context {
@@ -42,4 +43,14 @@ func CtxUsers(users postgres.UsersStorage) func(context.Context) context.Context
 
 func Users(r *http.Request) postgres.UsersStorage {
 	return r.Context().Value(ctxUsers).(postgres.UsersStorage).New()
+}
+
+func CtxGroups(groups postgres.GroupsStorage) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, ctxGroups, groups)
+	}
+}
+
+func Groups(r *http.Request) postgres.GroupsStorage {
+	return r.Context().Value(ctxGroups).(postgres.GroupsStorage).New()
 }

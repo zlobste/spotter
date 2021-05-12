@@ -13,7 +13,6 @@ type CreateUserRequest struct {
 	Data data.User `json:"data"`
 }
 
-// Basic data validation
 func (r CreateUserRequest) Validate() error {
 	return validation.ValidateStruct(&r.Data,
 		validation.Field(&r.Data.Name, validation.Required, validation.Length(4, 50)),
