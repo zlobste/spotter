@@ -63,7 +63,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	userId := chi.URLParam(r, "id")
+	userId := chi.URLParam(r, "user_id")
 	if userId == "" {
 		utils.Respond(w, http.StatusForbidden, utils.Message("User id is empty"))
 		return

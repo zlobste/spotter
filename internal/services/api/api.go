@@ -68,12 +68,19 @@ func (a *api) router() chi.Router {
 
 	router.Route("/users", func(r chi.Router) {
 		r.Post("/create", handlers.CreateUserHandler)
-		r.Get("/{id}", handlers.GetUserHandler)
+		r.Get("/{user_id}", handlers.GetUserHandler)
 	})
-	router.Route("/group", func(r chi.Router) {
+	router.Route("/groups", func(r chi.Router) {
+		r.Post("/create", handlers.CreateGroupHandler)
+		r.Get("/{group_id}", handlers.GetGroupHandler)
+		r.Get("/{group_id}/users", handlers.GetGroupUsersHandler)
+		r.Post("/add_user", handlers.AddUserToGroupHandler)
+	})
+	/*	router.Route("/timer", func(r chi.Router) {
 		r.Post("/create", handlers.CreateGroupHandler)
 		r.Get("/{id}", handlers.GetGroupHandler)
-	})
+		r.Post("/{id}/users", handlers.AddUserToGroupHandler)
+	})*/
 
 	return router
 }

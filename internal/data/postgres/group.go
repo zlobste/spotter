@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	groupsTable = "groups"
+	groupsTable      = "groups"
+	usersGroupsTable = "users_groups"
 )
 
 type groupStorage struct {
@@ -23,6 +24,8 @@ type GroupsStorage interface {
 	CreateGroup(group data.Group) error
 	UpdateGroup(id uint64, group data.Group) error
 	DeleteGroup(id uint64) error
+	GetGroupUsers(id uint64) ([]data.User, error)
+	AddUserToGroup(groupUser data.UserGroup) error
 }
 
 var groupsSelect = sq.Select(all).From(groupsTable).PlaceholderFormat(sq.Dollar)
@@ -112,6 +115,44 @@ func (s *groupStorage) DeleteGroup(id uint64) error {
 	_, err := s.newDelete().Where(sq.Eq{"id": id}).Exec()
 	if err != nil {
 		return errors.Wrap(err, "failed to delete group")
+	}
+	return nil
+}
+
+func (s *groupStorage) GetGroupUsers(id uint64) ([]data.User, error) {
+	rows, err := s.db.Query("select * from users where id in (select user_id from users_groups where group_id = $1)", id)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var models []data.User
+
+	for rows.Next() {
+		model := data.User{}
+		err := rows.Scan(
+			&model.Id,
+			&model.Name,
+			&model.Surname,
+			&model.Email,
+			&model.Password,
+			&model.Role,
+			&model.Balance,
+			&model.Salary,
+		)
+		if err != nil {
+			return nil, err
+		}
+		model.Password = ""
+		models = append(models, model)
+	}
+
+	return models, nil
+}
+
+func (s *groupStorage) AddUserToGroup(groupUser data.UserGroup) error {
+	_, err := sq.Insert(usersGroupsTable).RunWith(s.db).PlaceholderFormat(sq.Dollar).SetMap(groupUser.ToMap()).Exec()
+	if err != nil {
+		return errors.Wrap(err, "failed to add user to group")
 	}
 	return nil
 }
