@@ -67,28 +67,38 @@ func (a *api) router() chi.Router {
 		),
 	)
 
-	router.Route("/users", func(r chi.Router) {
-		r.Get("/{user_id}", handlers.GetUserHandler)
-		r.Get("/drivers", handlers.GetAllDriversHandler)
-		r.Get("/managers", handlers.GetAllManagersHandler)
-
-		r.Post("/set_manager/{user_id}", handlers.SetManagerHandler)
-		r.Post("/block/{user_id}", handlers.BlockUserHandler)
-		r.Post("/unblock/{user_id}", handlers.UnblockUserHandler)
-		// r.Post("/create", handlers.CreateUserHandler)
+	router.Group(func(r chi.Router) {
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/register", handlers.RegisterHandler)
+			r.Post("/login", handlers.LoginHandler)
+		})
 	})
 
-	router.Route("/timers", func(r chi.Router) {
-		r.Get("/drivers/{user_id}", handlers.GetTimersByDriverHandler)
-		r.Get("/{timer_id}", handlers.GetTimerHandler)
-		r.Get("/pending/{user_id}", handlers.GetPendingTimerHandler)
-		r.Post("/start/{user_id}", handlers.StartTimerHandler)
-		r.Post("/stop/{user_id}", handlers.StopTimerHandler)
-	})
+	router.Group(func(r chi.Router) {
+		r.Use(middlewares.JWTMiddleware)
 
-	router.Route("/proofs", func(r chi.Router) {
-		r.Get("/{timer_id}", handlers.GetProofsByTimerHandler)
-		r.Post("/", handlers.MakeProofHandler)
+		r.Route("/users", func(r chi.Router) {
+			r.Get("/{user_id}", handlers.GetUserHandler)
+			r.Get("/drivers", handlers.GetAllDriversHandler)
+			r.Get("/managers", handlers.GetAllManagersHandler)
+
+			r.Post("/set_manager/{user_id}", handlers.SetManagerHandler)
+			r.Post("/block/{user_id}", handlers.BlockUserHandler)
+			r.Post("/unblock/{user_id}", handlers.UnblockUserHandler)
+		})
+
+		r.Route("/timers", func(r chi.Router) {
+			r.Get("/drivers/{user_id}", handlers.GetTimersByDriverHandler)
+			r.Get("/{timer_id}", handlers.GetTimerHandler)
+			r.Get("/pending/{user_id}", handlers.GetPendingTimerHandler)
+			r.Post("/start/{user_id}", handlers.StartTimerHandler)
+			r.Post("/stop/{user_id}", handlers.StopTimerHandler)
+		})
+
+		r.Route("/proofs", func(r chi.Router) {
+			r.Get("/{timer_id}", handlers.GetProofsByTimerHandler)
+			r.Post("/", handlers.MakeProofHandler)
+		})
 	})
 
 	return router

@@ -11,13 +11,12 @@ import (
 	"strconv"
 )
 
-func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
-
-	request, err := requests.NewCreateUserRequest(r)
+	request, err := requests.NewRegisterRequest(r)
 	if err != nil {
 		if verr, ok := err.(ozzoval.Errors); ok {
-			log.WithError(verr).Debug("failed to parse create user request")
+			log.WithError(verr).Debug("failed to parse registration request")
 			utils.Respond(w, http.StatusBadRequest, utils.Message(fmt.Sprintf("request was invalid in some way: %s", verr.Error())))
 			return
 		}
@@ -26,13 +25,11 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request.Data.Password, err = utils.HashAndSalt(request.Data.Password)
-	if err != nil {
-		log.WithError(err).Error("failed to hash user password")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened hashing user password"))
+	if err := request.Data.EncryptPassword(); err != nil {
+		log.WithError(err).Error("failed to encrypt password")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened"))
 		return
 	}
-
 	user, err := context.Users(r).GetUserByEmail(request.Data.Email)
 	if err != nil {
 		log.WithError(err).Error("failed to get user")
@@ -44,22 +41,52 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Respond(w, http.StatusNotFound, utils.Message("specified user exist already"))
 		return
 	}
-
 	err = context.Users(r).CreateUser(request.Data)
 	if err != nil {
 		log.WithError(err).Error("failed to create user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened creating the user"))
 		return
 	}
-
 	user, err = context.Users(r).GetUserByEmail(request.Data.Email)
 	if err != nil {
 		log.WithError(err).Error("failed to find user")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the user"))
 		return
 	}
-
 	utils.Respond(w, http.StatusOK, utils.Message(user.ToReturn()))
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	log := context.Log(r)
+	request, err := requests.NewLoginRequest(r)
+	if err != nil {
+		if verr, ok := err.(ozzoval.Errors); ok {
+			log.WithError(verr).Debug("failed to parse login request")
+			utils.Respond(w, http.StatusBadRequest, utils.Message(fmt.Sprintf("request was invalid in some way: %s", verr.Error())))
+			return
+		}
+		log.WithError(err).Error("failed to parse create user request")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened parsing the request"))
+		return
+	}
+	user, err := context.Users(r).GetUserByEmail(request.Data.Email)
+	if err != nil {
+		log.WithError(err).Error("failed to get user")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened"))
+		return
+	}
+	if user == nil || !user.ComparePassword(request.Data.Password) || user.Blocked {
+		log.WithError(err).Debug("User does not exist")
+		utils.Respond(w, http.StatusNotFound, utils.Message("Bad access"))
+		return
+	}
+	token, err := utils.CreateJWT(user.Id)
+	if err != nil {
+		log.WithError(err).Debug("Failed to create jwt")
+		utils.Respond(w, http.StatusOK, utils.Message("Bad access"))
+		return
+	}
+	utils.Respond(w, http.StatusOK, utils.Message(requests.JWT{Token: token}))
 }
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {

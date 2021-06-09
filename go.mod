@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/alecthomas/kingpin v2.2.6+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v1.5.4
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gobuffalo/logger v1.0.4 // indirect

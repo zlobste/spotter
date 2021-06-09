@@ -1,5 +1,10 @@
 package data
 
+import (
+	"errors"
+	"golang.org/x/crypto/bcrypt"
+)
+
 const (
 	RoleTypeAdmin = iota
 	RoleTypeManager
@@ -38,4 +43,20 @@ func (u *User) ToReturn() map[string]interface{} {
 		"blocked": u.Blocked,
 	}
 	return result
+}
+
+func (u *User) EncryptPassword() error {
+	if len(u.Password) == 0 {
+		return errors.New("Wrong password length!")
+	}
+	enc, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MinCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(enc)
+	return nil
+}
+
+func (u *User) ComparePassword(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(password), []byte(u.Password)) != nil
 }
