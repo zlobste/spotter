@@ -23,7 +23,7 @@ func GetProofsByTimerHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 	if err != nil {
 		log.WithError(err).Error("failed to find proofs")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the proofs"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 	utils.Respond(w, http.StatusOK, utils.Message(proofs))

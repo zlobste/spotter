@@ -79,20 +79,19 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 	if err != nil {
 		log.WithError(err).Error("failed to find user")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the user"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 
 	utils.Respond(w, http.StatusOK, utils.Message(user.ToReturn()))
 }
 
-
 func GetAllDriversHandler(w http.ResponseWriter, r *http.Request) {
 	drivers, err := context.Users(r).GetAllDrivers()
 	log := context.Log(r)
 	if err != nil {
 		log.WithError(err).Error("failed to find drivers")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the drivers"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 
@@ -104,13 +103,12 @@ func GetAllManagersHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 	if err != nil {
 		log.WithError(err).Error("failed to find managers")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the managers"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 
 	utils.Respond(w, http.StatusOK, utils.Message(managers))
 }
-
 
 func SetManagerHandler(w http.ResponseWriter, r *http.Request) {
 	userId := chi.URLParam(r, "user_id")
@@ -126,7 +124,7 @@ func SetManagerHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 	if err := context.Users(r).SetManager(uint64(id)); err != nil {
 		log.WithError(err).Error("failed to set manager")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to set manager"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 
@@ -147,7 +145,7 @@ func BlockUserHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 	if err := context.Users(r).BlockUser(uint64(id)); err != nil {
 		log.WithError(err).Error("failed to block user")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to block user"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 
@@ -168,7 +166,7 @@ func UnblockUserHandler(w http.ResponseWriter, r *http.Request) {
 	log := context.Log(r)
 	if err := context.Users(r).UnblockUser(uint64(id)); err != nil {
 		log.WithError(err).Error("failed to unblock user")
-		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to unblock user"))
+		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
 		return
 	}
 

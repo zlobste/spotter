@@ -5,6 +5,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
 	"github.com/zlobste/spotter/internal/data"
+	"time"
 )
 
 const (
@@ -19,6 +20,9 @@ type TimersStorage interface {
 	CreateTimer(timer data.Timer) error
 	UpdateTimer(id uint64, timer data.Timer) error
 	DeleteTimer(id uint64) error
+	StartTimer(userId uint64) error
+	StopTimer(userId uint64) error
+	GetPendingTimer(userId uint64) (*data.Timer, error)
 }
 
 type timerStorage struct {
@@ -127,4 +131,40 @@ func (s *timerStorage) DeleteTimer(id uint64) error {
 func (s *timerStorage) GetTimersByDriver(id uint64) ([]data.Timer, error) {
 	s.sql = s.sql.Where(sq.Eq{"driver_id": id})
 	return s.Select()
+}
+
+func (s *timerStorage) StartTimer(userId uint64) error {
+	pendingTimer, err := s.GetPendingTimer(userId)
+	if err != nil {
+		return err
+	}
+	if pendingTimer != nil {
+		return errors.New("timer is pending")
+	}
+	newTimer := data.Timer{
+		UserId:    userId,
+		StartTime: time.Now(),
+		Pending:   true,
+	}
+	_, err = s.newInsert().SetMap(newTimer.ToMap()).Exec()
+	return errors.Wrap(err, "failed to insert timer")
+}
+
+func (s *timerStorage) StopTimer(userId uint64) error {
+	pendingTimer, err := s.GetPendingTimer(userId)
+	if err != nil {
+		return err
+	}
+	if pendingTimer == nil {
+		return errors.New("there is no pending timer")
+	}
+	pendingTimer.EndTime = time.Now()
+	pendingTimer.Pending = false
+	_, err = s.newUpdate().SetMap(pendingTimer.ToMap()).Where(sq.Eq{"user_id": userId}).Exec()
+	return err
+}
+
+func (s *timerStorage) GetPendingTimer(userId uint64) (*data.Timer, error) {
+	s.sql = s.sql.Where(sq.Eq{"pending": true, "user_id": userId})
+	return s.Get()
 }
