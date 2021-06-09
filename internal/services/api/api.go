@@ -63,6 +63,7 @@ func (a *api) router() chi.Router {
 			context.CtxConfig(a.config),
 			context.CtxUsers(postgres.NewUsersStorage(a.db)),
 			context.CtxTimers(postgres.NewTimersStorage(a.db)),
+			context.CtxProofs(postgres.NewProofsStorage(a.db)),
 		),
 	)
 
