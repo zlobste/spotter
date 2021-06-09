@@ -11,11 +11,6 @@ const (
 	timersTable = "timers"
 )
 
-type timerStorage struct {
-	db  *sql.DB
-	sql sq.SelectBuilder
-}
-
 type TimersStorage interface {
 	New() TimersStorage
 	Get() (*data.Timer, error)
@@ -23,6 +18,11 @@ type TimersStorage interface {
 	CreateTimer(timer data.Timer) error
 	UpdateTimer(id uint64, timer data.Timer) error
 	DeleteTimer(id uint64) error
+}
+
+type timerStorage struct {
+	db  *sql.DB
+	sql sq.SelectBuilder
 }
 
 var timersSelect = sq.Select(all).From(timersTable).PlaceholderFormat(sq.Dollar)
@@ -43,9 +43,10 @@ func (s *timerStorage) Get() (*data.Timer, error) {
 	model := data.Timer{}
 	err := rowScanner.Scan(
 		&model.Id,
-		&model.GroupId,
+		&model.UserId,
 		&model.StartTime,
-		&model.Duration,
+		&model.EndTime,
+		&model.Pending,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, errors.Wrap(err, "failed to query model")

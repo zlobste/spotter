@@ -4,16 +4,18 @@ import "time"
 
 type Timer struct {
 	Id        uint64    `db:"id" json:"id"`
-	GroupId   uint64    `db:"group_id" json:"group_id"`
+	UserId    uint64    `db:"user_id" json:"user_id"`
 	StartTime time.Time `db:"start_time" json:"start_time"`
-	Duration  time.Time `db:"duration" json:"duration"`
+	EndTime   time.Time `db:"end_time" json:"end_time"`
+	Pending   bool      `db:"pending" json:"pending"`
 }
 
 func (t Timer) ToMap() map[string]interface{} {
 	result := map[string]interface{}{
-		"group_id":   t.GroupId,
+		"user_id":    t.UserId,
 		"start_time": t.StartTime,
-		"duration":   t.Duration,
+		"end_time":   t.EndTime,
+		"pending":    t.Pending,
 	}
 
 	return result
@@ -22,9 +24,10 @@ func (t Timer) ToMap() map[string]interface{} {
 func (t Timer) ToReturn() map[string]interface{} {
 	result := map[string]interface{}{
 		"id":         t.Id,
-		"group_id":   t.GroupId,
+		"user_id":    t.UserId,
 		"start_time": t.StartTime,
-		"duration":   t.Duration,
+		"end_time":   t.EndTime,
+		"pending":    t.Pending,
 	}
 
 	return result

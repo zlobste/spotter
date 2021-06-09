@@ -62,7 +62,6 @@ func (a *api) router() chi.Router {
 			context.CtxLog(a.log),
 			context.CtxConfig(a.config),
 			context.CtxUsers(postgres.NewUsersStorage(a.db)),
-			context.CtxGroups(postgres.NewGroupsStorage(a.db)),
 			context.CtxTimers(postgres.NewTimersStorage(a.db)),
 		),
 	)
@@ -70,12 +69,6 @@ func (a *api) router() chi.Router {
 	router.Route("/users", func(r chi.Router) {
 		r.Post("/create", handlers.CreateUserHandler)
 		r.Get("/{user_id}", handlers.GetUserHandler)
-	})
-	router.Route("/groups", func(r chi.Router) {
-		r.Post("/create", handlers.CreateGroupHandler)
-		r.Get("/{group_id}", handlers.GetGroupHandler)
-		r.Get("/{group_id}/users", handlers.GetGroupUsersHandler)
-		r.Post("/add_user", handlers.AddUserToGroupHandler)
 	})
 	router.Route("/timers", func(r chi.Router) {
 		r.Post("/create", handlers.CreateTimerHandler)

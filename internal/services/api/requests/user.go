@@ -19,14 +19,12 @@ func (r CreateUserRequest) Validate() error {
 		validation.Field(&r.Data.Surname, validation.Required, validation.Length(4, 50)),
 		validation.Field(&r.Data.Email, validation.Required, is.Email),
 		validation.Field(&r.Data.Password, validation.Required, validation.Length(4, 50)),
-		validation.Field(&r.Data.Salary, validation.Required),
 	)
 }
 
 func NewCreateUserRequest(r *http.Request) (*CreateUserRequest, error) {
 	req := CreateUserRequest{}
-	req.Data.Role = data.RoleTypeUser
-	req.Data.Balance = 0
+	req.Data.Role = data.RoleTypeDriver
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {

@@ -12,11 +12,6 @@ const (
 	all        = "*"
 )
 
-type userStorage struct {
-	db  *sql.DB
-	sql sq.SelectBuilder
-}
-
 type UsersStorage interface {
 	New() UsersStorage
 	Get() (*data.User, error)
@@ -25,6 +20,11 @@ type UsersStorage interface {
 	CreateUser(user data.User) error
 	UpdateUser(id uint64, user data.User) error
 	DeleteUser(id uint64) error
+}
+
+type userStorage struct {
+	db  *sql.DB
+	sql sq.SelectBuilder
 }
 
 var usersSelect = sq.Select(all).From(usersTable).PlaceholderFormat(sq.Dollar)
@@ -50,8 +50,7 @@ func (s *userStorage) Get() (*data.User, error) {
 		&model.Email,
 		&model.Password,
 		&model.Role,
-		&model.Balance,
-		&model.Salary,
+		&model.Blocked,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, errors.Wrap(err, "failed to query model")
