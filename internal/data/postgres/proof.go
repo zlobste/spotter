@@ -5,10 +5,12 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
 	"github.com/zlobste/spotter/internal/data"
+	"time"
 )
 
 const (
-	proofsTable = "proofs"
+	proofsTable            = "proofs"
+	proofThreshold float64 = 0.3
 )
 
 type ProofsStorage interface {
@@ -18,7 +20,8 @@ type ProofsStorage interface {
 	CreateProof(proof data.Proof) error
 	UpdateProof(id uint64, proof data.Proof) error
 	DeleteProof(id uint64) error
-	GetProofsByTimer(id uint64) ([]data.Proof, error)
+	GetProofsByTimer(timerId uint64) ([]data.Proof, error)
+	MakeProof(timerId uint64, percentage float64) error
 }
 
 type proofStorage struct {
@@ -127,4 +130,15 @@ func (s *proofStorage) DeleteProof(id uint64) error {
 func (s *proofStorage) GetProofsByTimer(id uint64) ([]data.Proof, error) {
 	s.sql = s.sql.Where(sq.Eq{"timer_id": id})
 	return s.Select()
+}
+
+func (s *proofStorage) MakeProof(timerId uint64, percentage float64) error {
+	proof := data.Proof{
+		TimerId:    timerId,
+		Time:       time.Now(),
+		Percentage: percentage,
+		Confirmed:  percentage < proofThreshold,
+	}
+	_, err := s.newInsert().SetMap(proof.ToMap()).Exec()
+	return err
 }

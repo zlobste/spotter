@@ -14,13 +14,11 @@ func GetTimerHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Respond(w, http.StatusForbidden, utils.Message("Timer id is empty"))
 		return
 	}
-
 	id, err := strconv.Atoi(timerId)
 	if timerId == "" {
 		utils.Respond(w, http.StatusForbidden, utils.Message("Invalid id"))
 		return
 	}
-
 	timer, err := context.Timers(r).GetTimerById(uint64(id))
 	log := context.Log(r)
 	if err != nil {
@@ -43,8 +41,8 @@ func GetTimersByDriverHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Respond(w, http.StatusForbidden, utils.Message("invalid id"))
 		return
 	}
-	timers, err := context.Timers(r).GetTimersByDriver(uint64(id))
 	log := context.Log(r)
+	timers, err := context.Timers(r).GetTimersByDriver(uint64(id))
 	if err != nil {
 		log.WithError(err).Error("failed to find timers")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))
@@ -64,8 +62,8 @@ func GetPendingTimerHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Respond(w, http.StatusForbidden, utils.Message("invalid id"))
 		return
 	}
-	timer, err := context.Timers(r).GetPendingTimer(uint64(id))
 	log := context.Log(r)
+	timer, err := context.Timers(r).GetPendingTimer(uint64(id))
 	if err != nil {
 		log.WithError(err).Error("failed to find pending timer")
 		utils.Respond(w, http.StatusInternalServerError, utils.Message(err.Error()))

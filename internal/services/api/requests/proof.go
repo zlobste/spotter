@@ -3,17 +3,16 @@ package requests
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
-	"github.com/zlobste/spotter/internal/data"
 	"net/http"
 )
 
-type CreateTimerRequest struct {
-	Data data.Timer `json:"data"`
+type MakeProofRequest struct {
+	TimerId    uint64  `json:"timer_id"`
+	Percentage float64 `json:"percentage"`
 }
 
-func NewCreateTimerRequest(r *http.Request) (*CreateTimerRequest, error) {
-	req := CreateTimerRequest{}
-
+func NewMakeProofRequest(r *http.Request) (* MakeProofRequest, error) {
+	req :=  MakeProofRequest{}
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode request body")
