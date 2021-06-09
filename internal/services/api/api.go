@@ -81,5 +81,9 @@ func (a *api) router() chi.Router {
 		r.Post("/create", handlers.CreateTimerHandler)
 	})
 
+	router.Route("/proofs", func(r chi.Router) {
+		r.Get("/{timer_id}", handlers.GetProofsByTimerHandler)
+	})
+
 	return router
 }

@@ -18,6 +18,7 @@ type ProofsStorage interface {
 	CreateProof(proof data.Proof) error
 	UpdateProof(id uint64, proof data.Proof) error
 	DeleteProof(id uint64) error
+	GetProofsByTimer(id uint64) ([]data.Proof, error)
 }
 
 type proofStorage struct {
@@ -68,7 +69,7 @@ func (s *proofStorage) Select() ([]data.Proof, error) {
 		model := data.Proof{}
 		err := rows.Scan(
 			&model.Id,
-			&model.Time,
+			&model.TimerId,
 			&model.Time,
 			&model.Percentage,
 			&model.Confirmed,
@@ -121,4 +122,9 @@ func (s *proofStorage) DeleteProof(id uint64) error {
 		return errors.Wrap(err, "failed to delete proof")
 	}
 	return nil
+}
+
+func (s *proofStorage) GetProofsByTimer(id uint64) ([]data.Proof, error) {
+	s.sql = s.sql.Where(sq.Eq{"timer_id": id})
+	return s.Select()
 }
