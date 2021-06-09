@@ -72,6 +72,9 @@ func (a *api) router() chi.Router {
 		r.Get("/drivers", handlers.GetAllDriversHandler)
 		r.Get("/managers", handlers.GetAllManagersHandler)
 
+		r.Post("/set_manager/{user_id}", handlers.SetManagerHandler)
+		r.Post("/block/{user_id}", handlers.BlockUserHandler)
+		r.Post("/unblock/{user_id}", handlers.UnblockUserHandler)
 		// r.Post("/create", handlers.CreateUserHandler)
 	})
 

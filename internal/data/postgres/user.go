@@ -22,6 +22,9 @@ type UsersStorage interface {
 	DeleteUser(id uint64) error
 	GetAllManagers() ([]data.User, error)
 	GetAllDrivers() ([]data.User, error)
+	SetManager(id uint64) error
+	BlockUser(id uint64) error
+	UnblockUser(id uint64) error
 }
 
 type userStorage struct {
@@ -144,4 +147,28 @@ func (s *userStorage) GetAllManagers() ([]data.User, error) {
 func (s *userStorage) GetAllDrivers() ([]data.User, error) {
 	s.sql = s.sql.Where(sq.Eq{"role": data.RoleTypeDriver})
 	return s.Select()
+}
+
+func (s *userStorage) SetManager(id uint64) error {
+	_, err := s.newUpdate().Set("role", data.RoleTypeManager).Where(sq.Eq{"id": id}).Exec()
+	if err != nil {
+		return errors.Wrap(err, "failed to update user data")
+	}
+	return nil
+}
+
+func (s *userStorage) BlockUser(id uint64) error {
+	_, err := s.newUpdate().Set("blocked", true).Where(sq.Eq{"id": id}).Exec()
+	if err != nil {
+		return errors.Wrap(err, "failed to block user")
+	}
+	return nil
+}
+
+func (s *userStorage) UnblockUser(id uint64) error {
+	_, err := s.newUpdate().Set("blocked", false).Where(sq.Eq{"id": id}).Exec()
+	if err != nil {
+		return errors.Wrap(err, "failed to unblock user")
+	}
+	return nil
 }

@@ -110,3 +110,67 @@ func GetAllManagersHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.Respond(w, http.StatusOK, utils.Message(managers))
 }
+
+
+func SetManagerHandler(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "user_id")
+	if userId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("User id is empty"))
+		return
+	}
+	id, err := strconv.Atoi(userId)
+	if err != nil {
+		utils.Respond(w, http.StatusForbidden, utils.Message("Invalid id"))
+		return
+	}
+	log := context.Log(r)
+	if err := context.Users(r).SetManager(uint64(id)); err != nil {
+		log.WithError(err).Error("failed to set manager")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to set manager"))
+		return
+	}
+
+	utils.Respond(w, http.StatusOK, utils.Message(true))
+}
+
+func BlockUserHandler(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "user_id")
+	if userId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("User id is empty"))
+		return
+	}
+	id, err := strconv.Atoi(userId)
+	if err != nil {
+		utils.Respond(w, http.StatusForbidden, utils.Message("Invalid id"))
+		return
+	}
+	log := context.Log(r)
+	if err := context.Users(r).BlockUser(uint64(id)); err != nil {
+		log.WithError(err).Error("failed to block user")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to block user"))
+		return
+	}
+
+	utils.Respond(w, http.StatusOK, utils.Message(true))
+}
+
+func UnblockUserHandler(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "user_id")
+	if userId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("User id is empty"))
+		return
+	}
+	id, err := strconv.Atoi(userId)
+	if err != nil {
+		utils.Respond(w, http.StatusForbidden, utils.Message("Invalid id"))
+		return
+	}
+	log := context.Log(r)
+	if err := context.Users(r).UnblockUser(uint64(id)); err != nil {
+		log.WithError(err).Error("failed to unblock user")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to unblock user"))
+		return
+	}
+
+	utils.Respond(w, http.StatusOK, utils.Message(true))
+}
