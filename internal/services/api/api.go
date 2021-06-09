@@ -68,12 +68,17 @@ func (a *api) router() chi.Router {
 	)
 
 	router.Route("/users", func(r chi.Router) {
-		r.Post("/create", handlers.CreateUserHandler)
 		r.Get("/{user_id}", handlers.GetUserHandler)
+		r.Get("/drivers", handlers.GetAllDriversHandler)
+		r.Get("/managers", handlers.GetAllManagersHandler)
+
+		// r.Post("/create", handlers.CreateUserHandler)
 	})
+
 	router.Route("/timers", func(r chi.Router) {
-		r.Post("/create", handlers.CreateTimerHandler)
+		r.Get("/drivers/{driver_id}", handlers.GetTimersByDriverHandler)
 		r.Get("/{timer_id}", handlers.GetTimerHandler)
+		r.Post("/create", handlers.CreateTimerHandler)
 	})
 
 	return router

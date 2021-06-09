@@ -15,6 +15,7 @@ type TimersStorage interface {
 	New() TimersStorage
 	Get() (*data.Timer, error)
 	GetTimerById(id uint64) (*data.Timer, error)
+	GetTimersByDriver(id uint64) ([]data.Timer, error)
 	CreateTimer(timer data.Timer) error
 	UpdateTimer(id uint64, timer data.Timer) error
 	DeleteTimer(id uint64) error
@@ -56,6 +57,32 @@ func (s *timerStorage) Get() (*data.Timer, error) {
 	return &model, nil
 }
 
+func (s *timerStorage) Select() ([]data.Timer, error) {
+	rows, err := s.sql.RunWith(s.db).Query()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var models []data.Timer
+
+	for rows.Next() {
+		model := data.Timer{}
+		err := rows.Scan(
+			&model.Id,
+			&model.UserId,
+			&model.StartTime,
+			&model.EndTime,
+			&model.Pending,
+		)
+		if err != nil {
+			return nil, err
+		}
+		models = append(models, model)
+	}
+
+	return models, nil
+}
+
 func (s *timerStorage) GetTimerById(id uint64) (*data.Timer, error) {
 	s.sql = s.sql.Where(sq.Eq{"id": id})
 	return s.Get()
@@ -95,4 +122,9 @@ func (s *timerStorage) DeleteTimer(id uint64) error {
 		return errors.Wrap(err, "failed to delete timer")
 	}
 	return nil
+}
+
+func (s *timerStorage) GetTimersByDriver(id uint64) ([]data.Timer, error) {
+	s.sql = s.sql.Where(sq.Eq{"driver_id": id})
+	return s.Select()
 }

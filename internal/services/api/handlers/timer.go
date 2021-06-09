@@ -59,3 +59,24 @@ func GetTimerHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.Respond(w, http.StatusOK, utils.Message(timer.ToReturn()))
 }
+
+func GetTimersByDriverHandler(w http.ResponseWriter, r *http.Request) {
+	driverId := chi.URLParam(r, "driver_id")
+	if driverId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("id is empty"))
+		return
+	}
+	id, err := strconv.Atoi(driverId)
+	if driverId == "" {
+		utils.Respond(w, http.StatusForbidden, utils.Message("invalid id"))
+		return
+	}
+	timers, err := context.Timers(r).GetTimersByDriver(uint64(id))
+	log := context.Log(r)
+	if err != nil {
+		log.WithError(err).Error("failed to find timers")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the timers"))
+		return
+	}
+	utils.Respond(w, http.StatusOK, utils.Message(timers))
+}

@@ -56,6 +56,32 @@ func (s *proofStorage) Get() (*data.Proof, error) {
 	return &model, nil
 }
 
+func (s *proofStorage) Select() ([]data.Proof, error) {
+	rows, err := s.sql.RunWith(s.db).Query()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var models []data.Proof
+
+	for rows.Next() {
+		model := data.Proof{}
+		err := rows.Scan(
+			&model.Id,
+			&model.Time,
+			&model.Time,
+			&model.Percentage,
+			&model.Confirmed,
+		)
+		if err != nil {
+			return nil, err
+		}
+		models = append(models, model)
+	}
+
+	return models, nil
+}
+
 func (s *proofStorage) GetProofById(id uint64) (*data.Proof, error) {
 	s.sql = s.sql.Where(sq.Eq{"id": id})
 	return s.Get()

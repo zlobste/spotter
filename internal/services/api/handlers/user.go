@@ -85,3 +85,28 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.Respond(w, http.StatusOK, utils.Message(user.ToReturn()))
 }
+
+
+func GetAllDriversHandler(w http.ResponseWriter, r *http.Request) {
+	drivers, err := context.Users(r).GetAllDrivers()
+	log := context.Log(r)
+	if err != nil {
+		log.WithError(err).Error("failed to find drivers")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the drivers"))
+		return
+	}
+
+	utils.Respond(w, http.StatusOK, utils.Message(drivers))
+}
+
+func GetAllManagersHandler(w http.ResponseWriter, r *http.Request) {
+	managers, err := context.Users(r).GetAllManagers()
+	log := context.Log(r)
+	if err != nil {
+		log.WithError(err).Error("failed to find managers")
+		utils.Respond(w, http.StatusInternalServerError, utils.Message("something bad happened trying to find the managers"))
+		return
+	}
+
+	utils.Respond(w, http.StatusOK, utils.Message(managers))
+}

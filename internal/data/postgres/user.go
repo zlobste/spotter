@@ -20,6 +20,8 @@ type UsersStorage interface {
 	CreateUser(user data.User) error
 	UpdateUser(id uint64, user data.User) error
 	DeleteUser(id uint64) error
+	GetAllManagers() ([]data.User, error)
+	GetAllDrivers() ([]data.User, error)
 }
 
 type userStorage struct {
@@ -58,6 +60,34 @@ func (s *userStorage) Get() (*data.User, error) {
 		return nil, nil
 	}
 	return &model, nil
+}
+
+func (s *userStorage) Select() ([]data.User, error) {
+	rows, err := s.sql.RunWith(s.db).Query()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var models []data.User
+
+	for rows.Next() {
+		model := data.User{}
+		err := rows.Scan(
+			&model.Id,
+			&model.Name,
+			&model.Surname,
+			&model.Email,
+			&model.Password,
+			&model.Role,
+			&model.Blocked,
+		)
+		if err != nil {
+			return nil, err
+		}
+		models = append(models, model)
+	}
+
+	return models, nil
 }
 
 func (s *userStorage) GetUserById(id uint64) (*data.User, error) {
@@ -104,4 +134,14 @@ func (s *userStorage) DeleteUser(id uint64) error {
 		return errors.Wrap(err, "failed to delete user")
 	}
 	return nil
+}
+
+func (s *userStorage) GetAllManagers() ([]data.User, error) {
+	s.sql = s.sql.Where(sq.Eq{"role": data.RoleTypeManager})
+	return s.Select()
+}
+
+func (s *userStorage) GetAllDrivers() ([]data.User, error) {
+	s.sql = s.sql.Where(sq.Eq{"role": data.RoleTypeDriver})
+	return s.Select()
 }
