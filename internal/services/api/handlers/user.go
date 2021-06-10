@@ -86,7 +86,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Respond(w, http.StatusOK, utils.Message("Bad access"))
 		return
 	}
-	utils.Respond(w, http.StatusOK, utils.Message(requests.JWT{Token: token}))
+	utils.Respond(
+		w,
+		http.StatusOK,
+		utils.Message(
+			requests.JWT{
+				Token:  token,
+				UserId: user.Id,
+				Role:   user.Role,
+			},
+		),
+	)
 }
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {

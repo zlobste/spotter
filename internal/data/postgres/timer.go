@@ -129,7 +129,7 @@ func (s *timerStorage) DeleteTimer(id uint64) error {
 }
 
 func (s *timerStorage) GetTimersByDriver(id uint64) ([]data.Timer, error) {
-	s.sql = s.sql.Where(sq.Eq{"driver_id": id})
+	s.sql = s.sql.Where(sq.Eq{"user_id": id})
 	return s.Select()
 }
 

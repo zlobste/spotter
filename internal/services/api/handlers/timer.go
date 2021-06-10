@@ -37,7 +37,7 @@ func GetTimersByDriverHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id, err := strconv.Atoi(userId)
-	if userId == "" {
+	if err != nil {
 		utils.Respond(w, http.StatusForbidden, utils.Message("invalid id"))
 		return
 	}

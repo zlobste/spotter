@@ -35,7 +35,6 @@ func NewRegisterRequest(r *http.Request) (*RegisterRequest, error) {
 	return &req, req.Validate()
 }
 
-
 type LoginRequest struct {
 	Data LoginData `json:"data"`
 }
@@ -43,11 +42,12 @@ type LoginRequest struct {
 type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Role     int64  `json:"role"`
 }
 
 type JWT struct {
-	Token string `json:"token"`
+	Token  string `json:"token"`
+	UserId uint64 `json:"user_id"`
+	Role   uint64 `json:"role"`
 }
 
 func NewLoginRequest(r *http.Request) (*LoginRequest, error) {
